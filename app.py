@@ -1,66 +1,3 @@
-from flask import Flask, request, send_from_directory
-
-app = Flask(__name__)
-
-# =====================
-# STEP 1: Student Data
-# =====================
-students = {
-    "1024071001": {"password": "ADCET@123", "name": "VAIDYA AACHAL RAJESH", "marks": {}},
-    "1024071003": {"password": "ADCET@123", "name": "KUMARMATH SHREYA PRAMOD", "marks": {}},
-    "1024071004": {"password": "ADCET@123", "name": "JADHAV ANUSHKA RAJENDRA", "marks": {}},
-    "1024071005": {"password": "ADCET@123", "name": "TALGHARKAR FARHAN IMTIYAZ", "marks": {}},
-    "1024071006": {"password": "ADCET@123", "name": "FADATARE POOJA ANIL", "marks": {}},
-    "1024071007": {"password": "ADCET@123", "name": "NAME VINIT DEEPAK", "marks": {}},
-    "1024071008": {"password": "ADCET@123", "name": "YEOLE VEDANT GIRISH", "marks": {}},
-    "1024071009": {"password": "ADCET@123", "name": "DANDEKAR CHIRAG RAMESH", "marks": {}},
-    "1024071010": {"password": "ADCET@123", "name": "GUPTA SONU NANDLAL", "marks": {}},
-    "1024071011": {"password": "ADCET@123", "name": "TIWARI TANMAY VIJAY", "marks": {}},
-    # (continue with rest of students + marks dictionary we prepared earlier)
-}
-
-# =====================
-# STEP 2: Static route (for logo)
-# =====================
-@app.route('/static/<path:filename>')
-def serve_static(filename):
-    return send_from_directory('static', filename)
-
-# =====================
-# STEP 3: Login Page
-# =====================
-@app.route('/', methods=['GET'])
-def login_form():
-    return '''
-    <html>
-    <head>
-        <title>Student Login</title>
-        <style>
-            body { font-family: Arial, sans-serif; text-align: center; margin-top: 50px; }
-            .login-box { width: 350px; margin: auto; border: 1px solid #ccc; padding: 30px; border-radius: 10px; }
-            input { width: 90%; padding: 10px; margin: 10px 0; border: 1px solid #ccc; border-radius: 5px; }
-            button { padding: 10px 20px; background-color: #0066cc; color: white; border: none; border-radius: 5px; }
-        </style>
-    </head>
-    <body>
-        <img src="/static/logo.png" alt="College Logo" style="height:100px;">
-        <h3>Sant Dnyaneshwar Shikshan Sanstha's</h3>
-        <h2 style="color:#b30000;">Annasaheb Dange College of Engineering and Technology</h2>
-        <div class="login-box">
-            <h2>Sign In</h2>
-            <form action="/result" method="post">
-                <input type="text" name="urn" placeholder="User Name" required><br>
-                <input type="password" name="password" placeholder="Password" required><br>
-                <button type="submit">Show Result</button>
-            </form>
-        </div>
-    </body>
-    </html>
-    '''
-
-# =====================
-# STEP 4: Result Page
-# =====================
 @app.route('/result', methods=['POST'])
 def result():
     urn = request.form.get('urn')
@@ -68,31 +5,59 @@ def result():
     student = students.get(urn)
 
     if student and student['password'] == password:
-        html = f'''
-        <div style="max-width: 900px; margin: auto; font-family: Arial, sans-serif; border: 1px solid #ccc; padding: 20px;">
-            <img src="/static/logo.png" alt="College Logo" style="display:block; margin:auto; height:100px;"><br/>
-            <h3 style="text-align:center; margin-bottom: 0;">Sant Dnyaneshwar Shikshan Sanstha's</h3>
-            <h2 style="text-align:center; margin-top: 5px;">Annasaheb Dange College of Engineering & Technology, Ashta</h2>
-            <h4 style="text-align:center;">Office of Controller of Examinations</h4>
-            <h4 style="text-align:center;">First Year Make-up Examination Provisional Result</h4>
+        html = f"""
+        <!DOCTYPE html>
+        <html lang="en">
+        <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1">
+            <title>Provisional Result</title>
+            <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+            <style>
+                body {{ background-color: #f8f9fa; }}
+                .result-card {{ max-width: 1000px; margin: 30px auto; padding: 30px; background: #fff; border-radius: 10px; box-shadow: 0 0 15px rgba(0,0,0,0.1); }}
+                .college-header {{ text-align: center; margin-bottom: 20px; }}
+                .college-header h2 {{ color: #b30000; margin: 5px 0; }}
+                .footer-text {{ font-size: 0.9rem; color: #555; text-align:center; margin-top: 30px; }}
+                .status-pass {{ color: green; font-weight: bold; }}
+                .status-fail {{ color: red; font-weight: bold; }}
+            </style>
+        </head>
+        <body>
+            <div class="container">
+                <div class="result-card">
+                    <div class="college-header">
+                        <img src="/static/logo.png" alt="College Logo" style="height:100px;">
+                        <h5>Sant Dnyaneshwar Shikshan Sanstha's</h5>
+                        <h2>Annasaheb Dange College of Engineering & Technology, Ashta</h2>
+                        <h6>Office of Controller of Examinations</h6>
+                        <h5 class="mt-3">First Year Make-up Examination Provisional Result</h5>
+                    </div>
 
-            <p><strong>URN No:</strong> {urn}<br/>
-            <strong>Student Name:</strong> {student['name']}<br/>
-            <strong>Examination:</strong> First Year B.Tech End Semester</p>
+                    <div class="mb-4">
+                        <p><strong>URN No:</strong> {urn}</p>
+                        <p><strong>Student Name:</strong> {student['name']}</p>
+                        <p><strong>Examination:</strong> First Year B.Tech End Semester</p>
+                    </div>
 
-            <table border="1" width="100%" style="border-collapse: collapse; text-align:center;">
-                <tr style="background-color:#f2f2f2;">
-                    <th>COURSE</th>
-                    <th>COURSE CODE</th>
-                    <th>ISE</th>
-                    <th>MSE</th>
-                    <th>LAB-ISE</th>
-                    <th>TH-ESE/LAB ESE</th>
-                    <th>LAB-ESE</th>
-                    <th>TOTAL MARKS</th>
-                    <th>GRADE</th>
-                </tr>
-        '''
+                    <table class="table table-bordered text-center">
+                        <thead class="table-dark">
+                            <tr>
+                                <th>COURSE</th>
+                                <th>COURSE CODE</th>
+                                <th>ISE</th>
+                                <th>MSE</th>
+                                <th>LAB-ISE</th>
+                                <th>TH-ESE</th>
+                                <th>LAB-ESE</th>
+                                <th>TOTAL</th>
+                                <th>GRADE</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+        """
+
+        status = "Pass"
         for subject, details in student['marks'].items():
             ise = details.get("ise", 0)
             mse = details.get("mse", 0)
@@ -108,8 +73,9 @@ def result():
                 grade = "DD"
             else:
                 grade = "FF"
+                status = "Fail"
 
-            html += f'''
+            html += f"""
                 <tr>
                     <td>{subject}</td>
                     <td>{details.get("course_code", "-")}</td>
@@ -121,20 +87,25 @@ def result():
                     <td>{total}</td>
                     <td>{grade}</td>
                 </tr>
-            '''
+            """
 
-        html += '''
-            </table>
-            <p><strong>CPI:</strong> -- &nbsp;&nbsp;&nbsp; <strong>Result Status:</strong> Provisional</p>
-            <br/><a href="/">Logout</a>
-        </div>
-        '''
+        html += f"""
+                        </tbody>
+                    </table>
+
+                    <p><strong>CPI:</strong> --</p>
+                    <p><strong>Result Status:</strong> <span class="{'status-pass' if status=='Pass' else 'status-fail'}">{status}</span></p>
+                    <a href="/" class="btn btn-danger mt-3">Logout</a>
+
+                    <div class="footer-text">
+                        <p>© 2025 Examination Cell - Annasaheb Dange College of Engineering & Technology</p>
+                        <p>Generated on: {__import__('datetime').datetime.now().strftime("%d-%m-%Y %H:%M:%S")}</p>
+                    </div>
+                </div>
+            </div>
+        </body>
+        </html>
+        """
         return html
 
     return "<h3>Invalid URN or Password</h3><a href='/'>Try Again</a>"
-
-# =====================
-# STEP 5: Run app (Render/Cloud hosting compatible)
-# =====================
-if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=5000)
